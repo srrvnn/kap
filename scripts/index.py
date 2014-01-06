@@ -2,39 +2,29 @@
 # part of an ambitious project to maintain files on a computer
 
 # author: srrvnn
-# license: not for reproduction
 
 import os
 import os.path
 
 import shutil
 
-folders = ["Pictures", "Documents", "Projects", "Music", "Videos", "Academics", "Trash", os.path.join("Pictures","Unsorted")]
-image_extensions = ["ANI","BMP","CAL","FAX","GIF","IMG","JBG","JPG", "JPEG","JPE","JPG","MAC","PBM","PCD","PCX","PCT","PGM","PNG","PPM","PSD","RAS","TGA","TIFF","WMF"]
+import rules_pictures
+import rules_documents
+# import rules_videos
+# import rules_music
 
-# function to detect if the give folder is an all pictures folder
+folders = ["Pictures", "Documents", "Projects", "Music", "Videos", "Academics", "Trash"]
+subfolders = []
 
-def isallpictures(d):
-
-	# check if all existing files have the extension	
-
-	for f in os.listdir(d):
-
-		if not isapicture(f): return False; 
-
-	return True;
-
-# function to detect if the give file is a picture
-
-def isapicture(f):
-	ext = os.path.splitext(str(f))[-1].upper()
-	ext = ext.replace(".","");
-
-	if ext in image_extensions: return True
-	else: return False
+for f in folders:
+	if str(f) in ("Projects", "Academics","Trash"): continue
+	subfolders.append(os.path.join(f,"Unsorted"))
 
 root = 'C:\Users\esgee\Projects\kap\_world'
 debug = False
+
+# ------------------------------
+# ROOT FOLDERS
 
 # make root level folders if they don't exist
 
@@ -42,39 +32,70 @@ for d in folders:
 	if not os.path.exists(os.path.join(root,d)):
 		os.makedirs(os.path.join(root,d))
 
-# move all pictures-only folders into Pictures
+# make sub folders if they don't exist
 
-for f in os.listdir(root):
+for d in subfolders:
+	if not os.path.exists(os.path.join(root,d)):
+		os.makedirs(os.path.join(root,d))
 
-	file_path = os.path.join(root,f);
+# ------------------------------
+# SORTING PICTURES 
+
+# move all pictures-only folders into 'Pictures'
+
+for d in os.listdir(root):
+
+	file_path = os.path.join(root,d);
 
 	# ignore if is isn't a directory
 
-	if not os.path.isdir(os.path.join(root,f)): continue
+	if not os.path.isdir(os.path.join(root,d)): continue
 
 	# ignore if it is an empty directory 
 
-	if not os.listdir(os.path.join(root,f)): continue
+	if not os.listdir(os.path.join(root,d)): continue
 
 	# ignore if is not a all pictures directory
 
-	if not isallpictures(os.path.join(root,f)): continue
+	if not rules_pictures.isallpictures(os.path.join(root,d)): continue
 
 	shutil.move(file_path, os.path.join(root, "Pictures"))
 
-# move all pictures into Pictures
+# move all pictures into 'Pictures'
 
 for f in os.listdir(root):
 
 	file_path = os.path.join(root, f);
 
-	if isapicture(f):
+	if rules_pictures.isapicture(f):
 
 		shutil.move(file_path, os.path.join(root, "Pictures", "Unsorted"));
-	
-# move all document-only folders into documents
 
-# create sub folders projects
+# ------------------------------
+# SORTING DOCUMENTS 
+	
+# move all document-only folders into 'Documents'
+
+# move all documents into 'Documents'
+
+for f in os.listdir(root):
+
+	file_path = os.path.join(root, f);
+
+	if rules_documents.isadocument(f):
+
+		shutil.move(file_path, os.path.join(root, "Documents", "Unsorted"));
+
+# ------------------------------
+# SORTING ACADEMICS
+
+# ------------------------------
+# SORTING ZIP FILES 
+
+# what to do about .zip files?
+
+# ------------------------------
+# PRINTING FINAL LIST
 
 # list the final folders for debug
 
