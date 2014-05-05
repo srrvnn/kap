@@ -40,4 +40,5 @@ nosetests.xml
 .sublime-workspace
 
 # World Files
-_*
+_world
+_preworld
